@@ -195,7 +195,7 @@ def prepare_data(root_path, leg, device, dtype):
         #padlen = min(int(0.5*gt_angle.shape[1]), 200)
         #gt_angle = filtfilt(b, a, gt_angle, padlen=padlen, axis=1)
     
-    #else:
+    #else: ## O/p from pretrained network -- simulated groundtruths
     gt_angle = None
 
     inpt_data = torch.cat([seg1_accel, seg1_gyro, seg2_accel, seg2_gyro], dim=-1)
