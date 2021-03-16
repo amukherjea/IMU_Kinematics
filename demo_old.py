@@ -179,7 +179,7 @@ def prepare_data(root_path, leg, device, dtype):
     seg2_accel_path = osp.join(root_path, '%s_seg2_acc.npy'%leg)
     seg1_gyro_path = osp.join(root_path, '%s_seg1_gyr.npy'%leg)
     seg2_gyro_path = osp.join(root_path, '%s_seg2_gyr.npy'%leg)
-    gt_angle_path = osp.join(root_path, '%s_mocap_ang.npy'%leg)
+    #gt_angle_path = osp.join(root_path, '%s_mocap_ang.npy'%leg)
 
     # Load custom data
     seg1_accel = load_custom_data(seg1_accel_path)
@@ -187,16 +187,16 @@ def prepare_data(root_path, leg, device, dtype):
     seg1_gyro = load_custom_data(seg1_gyro_path)
     seg2_gyro = load_custom_data(seg2_gyro_path)
 
-    if gt_angle_path is not "":
-        gt_angle = load_custom_data(gt_angle_path, is_imu_data=False)
+    #if gt_angle_path is not "":
+        #gt_angle = load_custom_data(gt_angle_path, is_imu_data=True)
         
-        # Smooth Ground-truth values
-        b, a = butter(4, 2*5/100, 'low')
-        padlen = min(int(0.5*gt_angle.shape[1]), 200)
-        gt_angle = filtfilt(b, a, gt_angle, padlen=padlen, axis=1)
+        ## Smooth Ground-truth values
+        #b, a = butter(4, 2*5/100, 'low')
+        #padlen = min(int(0.5*gt_angle.shape[1]), 200)
+        #gt_angle = filtfilt(b, a, gt_angle, padlen=padlen, axis=1)
     
-    else:
-        gt_angle = None
+    #else:
+    gt_angle = None
 
     inpt_data = torch.cat([seg1_accel, seg1_gyro, seg2_accel, seg2_gyro], dim=-1)
     inpt_data = inpt_data.to(device=device, dtype=dtype)
@@ -249,35 +249,44 @@ if __name__ == "__main__":
     
     inpt_data, inpt_gyro, gt_angle = prepare_data(root_path, leg, device, dtype)
     
-    angle_model_fldr = osp.join(args.angle_model_fldr, activity, joint)
-    ori_model_fldr = osp.join(args.ori_model_fldr, activity, joint)
+    # angle_model_fldr = osp.join(args.angle_model_fldr, activity, joint)
+    # ori_model_fldr = osp.join(args.ori_model_fldr, activity, joint)
+    angle_model_fldr = args.angle_model_fldr
+    ori_model_fldr = args.ori_model_fldr
 
 
     # Load prediction model
-    for model_fldr in [angle_model_fldr, ori_model_fldr]:
+    for model_fldr in [angle_model_fldr]: #, ori_model_fldr]:
         _, model, _ = next(os.walk(model_fldr))
+        
         model_fldr_ = osp.join(model_fldr, model[0])
-        with open(osp.join(model_fldr_, "model_kwargs.pkl"), "rb") as fopen:
+        #with open(osp.join(model_fldr_, "model_kwargs.pkl"), "rb") as fopen:
+        with open(osp.join(model_fldr, "model_kwargs.pkl"), "rb") as fopen:
             model_kwargs = pickle.load(fopen)
         model = globals()['CustomConv1D'](**model_kwargs) if model_kwargs["model_type"] == "CustomConv1D" \
                                                           else globals()['CustomLSTM'](**model_kwargs)
-        state_dict = torch.load(osp.join(model_fldr_, "model.pt"))
+        #state_dict = torch.load(osp.join(model_fldr_, "model.pt"))
+        state_dict = torch.load(osp.join(model_fldr, "model.pt"))
         model.load_state_dict(state_dict)
         model.to(device=device, dtype=dtype)
 
         if model_fldr == angle_model_fldr:
             angle_model = model
-            angle_norm_dict = torch.load(osp.join(model_fldr_, "norm_dict.pt"))['params']
+            #angle_norm_dict = torch.load(osp.join(model_fldr_, "norm_dict.pt"))['params']
+            angle_norm_dict = torch.load(osp.join(model_fldr, "norm_dict.pt"))['params']
 
         else:
             ori_model = model
-            ori_norm_dict = torch.load(osp.join(model_fldr_, "norm_dict.pt"))['params']        
+            #ori_norm_dict = torch.load(osp.join(model_fldr_, "norm_dict.pt"))['params']   
+            ori_norm_dict = torch.load(osp.join(model_fldr, "norm_dict.pt"))['params']        
 
     # Get optimization parameters (weight, std ratio)
-    with open('Data/5_Optimization/parameters.pkl', 'rb') as fopen:
-        params = pickle.load(fopen)
-    std_ratio = params['%s_%s_std'%(joint, activity)]
-    weight = params['%s_%s_weight'%(joint, activity)]
+    #with open('Data/5_Optimization/parameters.pkl', 'rb') as fopen:
+        #params = pickle.load(fopen)
+    #std_ratio = params['%s_%s_std'%(joint, activity)]
+    #weight = params['%s_%s_weight'%(joint, activity)]
+    std_ratio = 0.5
+    weight = 0.5
 
     run_demo(inpt_data, inpt_gyro, angle_norm_dict, 
              ori_norm_dict, angle_model, 
