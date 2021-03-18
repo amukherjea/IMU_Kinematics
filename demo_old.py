@@ -256,7 +256,7 @@ if __name__ == "__main__":
 
 
     # Load prediction model
-    for model_fldr in [angle_model_fldr]: #, ori_model_fldr]:
+    for model_fldr in [angle_model_fldr, ori_model_fldr]:
         _, model, _ = next(os.walk(model_fldr))
         
         model_fldr_ = osp.join(model_fldr, model[0])
