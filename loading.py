@@ -8,14 +8,14 @@ import pickle
 import os.path as osp
 from pdb import set_trace as st     # Debugging tips
 
-
-# Define your custom data
-left_seg1_acc = np.load('Data/my_new_result/Left_seg1_acc_high.npy')
-left_seg1_gyr = np.load('Data/my_new_result/Left_seg1_gyr_high.npy')
-left_seg2_acc = np.load('Data/my_new_result/Left_seg2_acc_high.npy')
-left_seg2_gyr = np.load('Data/my_new_result/Left_seg2_gyr_high.npy')
 pos = ['high','middle','low']
 i = 0
+# Define your custom data
+left_seg1_acc = np.load('Data/my_new_result/Left_seg1_acc_'+pos[i]+'.npy')
+left_seg1_gyr = np.load('Data/my_new_result/Left_seg1_gyr_'+pos[i]+'.npy')
+left_seg2_acc = np.load('Data/my_new_result/Left_seg2_acc_'+pos[i]+'.npy')
+left_seg2_gyr = np.load('Data/my_new_result/Left_seg2_gyr_'+pos[i]+'.npy')
+
 # TODO: Match your custom data with the data you used for training your model.
 
 
@@ -115,7 +115,6 @@ beta = optimization_demo(ori_pred, gyro_data, joint='Knee', leg='Left')
 # Get theta from alpha and beta
 # TODO: Please save std_ratio and weight before running this
 beta = (beta - beta.mean(axis=1)[:, None]) * std_ratio + alpha.mean(axis=1)[:, None]
-print(beta.shape, alpha.shape)
 theta = weight * alpha + (1 - weight) * beta
 result_path = osp.join('Data/my_new_result/Results/',('pred_angles_'+pos[i]+'.npy'))
 np.save(result_path,theta)
