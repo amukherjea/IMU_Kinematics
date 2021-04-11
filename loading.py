@@ -113,7 +113,9 @@ ori_pred = ori_pred.detach().cpu().double().numpy()     # Rotation matrix form o
 #######################################################################################################
 # Optimization                                                                                        #
 #######################################################################################################
-
+std_ratio = 1
+weight = 0.5
+start, end = 0, -1
 ## Run optimization
 gyro_data = np.concatenate([left_seg1_gyr[:, :, :-1], left_seg2_gyr[:, :, :-1]], axis=-1)
 beta = optimization_demo(ori_pred, gyro_data, joint='Knee', leg='Left')
@@ -121,8 +123,9 @@ beta = optimization_demo(ori_pred, gyro_data, joint='Knee', leg='Left')
 # Get theta from alpha and beta
 # TODO: Please save std_ratio and weight before running this
 beta = (beta - beta.mean(axis=1)[:, None]) * std_ratio + alpha.mean(axis=1)[:, None]
-theta = weight * alpha[:, start:end] + (1 - weight) * beta
-
+print(beta.shape, alpha.shape)
+theta = weight * alpha + (1 - weight) * beta
+np.save('pred_angles.npy',theta)
 
 
 
