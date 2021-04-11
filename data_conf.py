@@ -4,53 +4,39 @@ import os.path as osp
 from numpy import genfromtxt
 import h5py
 
-base_dir = 'Data'
-data_fldr = 'Exp_data'
+base_dir = 'Data/Vary_Length_Trials/Vary_Length_Trials'
+name_dir = 'Ankita/ankita_varylength_1/'
 result_fldr = 'my_new_result'            # Define your result folder name
 
-data_path = osp.join(base_dir, data_fldr)
+pos = ['high','low','middle']
+locations = ['high_BackLeftShank_Local','high_BackLeftThigh_Local','low_BackLeftShank_Local','low_BackLeftThigh_Local','middle_BackLeftShank_Local','middle_BackLeftThigh_Local']
 
-## ACC 
-path = osp.join(data_path,'Local_SensorData_LeftThigh.csv')
-data = genfromtxt(path, delimiter=',')
-data = data[1:,1:-1]
-acc = data[:,:3]
-gyro = data[:,3:]
-acc = acc[np.newaxis,:] #Add new axis for gyro
-gyro = gyro[np.newaxis,:]
-acc_file = np.save('Left_seg1_acc.npy',acc)
-gyr_file = np.save('Left_seg1_gyr.npy',gyro)
-path = osp.join(data_path,'Local_SensorData_LeftLowerLeg.csv')
-data = genfromtxt(path, delimiter=',')
-data = data[1:,1:-1]
-acc = data[:,:3]
-gyro = data[:,3:]
-acc = acc[np.newaxis,:]
-gyro = gyro[np.newaxis,:]
-acc_file = np.save('Left_seg2_acc.npy',acc)
-gyr_file = np.save('Left_seg2_gyr.npy',gyro)
-path = osp.join(data_path,'Local_SensorData_RightThigh.csv')
-data = genfromtxt(path, delimiter=',')
-data = data[1:,1:-1]
-acc = data[:,:3]
-gyro = data[:,3:]
-acc = acc[np.newaxis,:]
-gyro = gyro[np.newaxis,:]
-acc_file = np.save('Right_seg1_acc.npy',acc)
-gyr_file = np.save('Right_seg1_gyr.npy',gyro)
-path = osp.join(data_path,'Local_SensorData_RightLowerLeg.csv')
-data = genfromtxt(path, delimiter=',')
-data = data[1:,1:-1]
-acc = data[:,:3]
-gyro = data[:,3:]
-acc = acc[np.newaxis,:]
-gyro = gyro[np.newaxis,:]
-acc_file = np.save('Right_seg2_acc.npy',acc)
-gyr_file = np.save('Right_seg2_gyr.npy',gyro)
+data_path = osp.join(base_dir, name_dir)
+result_path = osp.join('Data',result_fldr)
+count = 0
+i =0
+for loc in range(0,len(locations),2):
+    path = osp.join(data_path,(locations[loc]+'.csv'))
+    data = genfromtxt(path, delimiter=',')
+    data = data[1:,1:-1]
+    acc = data[:,:3]
+    gyro = data[:,3:]
+    acc = acc[np.newaxis,:] #Add new axis for gyro
+    gyro = gyro[np.newaxis,:]
+    res_path = osp.join(result_path,('Left_seg1_acc_'+pos[i]+'.npy'))
+    acc_file = np.save(res_path,acc)
+    res_path = osp.join(result_path,('Left_seg1_gyr_'+pos[i]+'.npy'))
+    gyr_file = np.save(res_path,gyro)
 
-
-acc_file = h5py.File('acc_file.h5','w')
-acc_file.create_dataset('dataset_1', data=acc)
-acc_file.close()
-print(acc.shape,gyro.shape)
-
+    path = osp.join(data_path,(locations[loc+1]+'.csv'))
+    data = genfromtxt(path, delimiter=',')
+    data = data[1:,1:-1]
+    acc = data[:,:3]
+    gyro = data[:,3:]
+    acc = acc[np.newaxis,:] #Add new axis for gyro
+    gyro = gyro[np.newaxis,:]
+    res_path = osp.join(result_path,('Left_seg2_acc_'+pos[i]+'.npy'))
+    acc_file = np.save(res_path,acc)
+    res_path = osp.join(result_path,('Left_seg2_gyr_'+pos[i]+'.npy'))
+    gyr_file = np.save(res_path,gyro)
+    i+=1
