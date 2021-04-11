@@ -10,16 +10,12 @@ from pdb import set_trace as st     # Debugging tips
 
 
 # Define your custom data
-left_seg1_acc = np.load('Data/Exp_data/Knee/Left_seg1_acc.npy')
-left_seg1_gyr = np.load('Data/Exp_data/Knee/Left_seg1_gyr.npy')
-left_seg2_acc = np.load('Data/Exp_data/Knee/Left_seg2_acc.npy')
-left_seg2_gyr = np.load('Data/Exp_data/Knee/Left_seg2_gyr.npy')
-
-right_seg1_acc = np.load('Data/Exp_data/Knee/Right_seg1_acc.npy')
-right_seg1_gyr = np.load('Data/Exp_data/Knee/Right_seg1_gyr.npy')
-right_seg2_acc = np.load('Data/Exp_data/Knee/Right_seg2_acc.npy')
-right_seg2_gyr = np.load('Data/Exp_data/Knee/Right_seg2_gyr.npy')
-
+left_seg1_acc = np.load('Data/my_new_result/Left_seg1_acc_high.npy')
+left_seg1_gyr = np.load('Data/my_new_result/Left_seg1_gyr_high.npy')
+left_seg2_acc = np.load('Data/my_new_result/Left_seg2_acc_high.npy')
+left_seg2_gyr = np.load('Data/my_new_result/Left_seg2_gyr_high.npy')
+pos = ['high','middle','low']
+i = 0
 # TODO: Match your custom data with the data you used for training your model.
 
 
@@ -37,10 +33,6 @@ left_seg1_gyr = np.concatenate((left_seg1_gyr, np.linalg.norm(left_seg1_gyr, axi
 left_seg2_acc = np.concatenate((left_seg2_acc, np.linalg.norm(left_seg2_acc, axis=-1)[:, :, None]), axis=-1)
 left_seg2_gyr = np.concatenate((left_seg2_gyr, np.linalg.norm(left_seg2_gyr, axis=-1)[:, :, None]), axis=-1)
 
-right_seg1_acc = np.concatenate((right_seg1_acc, np.linalg.norm(right_seg1_acc, axis=-1)[:, :, None]), axis=-1)
-right_seg1_gyr = np.concatenate((right_seg1_gyr, np.linalg.norm(right_seg1_gyr, axis=-1)[:, :, None]), axis=-1)
-right_seg2_acc = np.concatenate((right_seg2_acc, np.linalg.norm(right_seg2_acc, axis=-1)[:, :, None]), axis=-1)
-right_seg2_gyr = np.concatenate((right_seg2_gyr, np.linalg.norm(right_seg2_gyr, axis=-1)[:, :, None]), axis=-1)
 
 input_data = np.concatenate((left_seg1_acc, left_seg1_gyr, left_seg2_acc, left_seg2_gyr), axis=-1)
 input_data = torch.from_numpy(input_data).to(device=device, dtype=dtype)
@@ -125,7 +117,8 @@ beta = optimization_demo(ori_pred, gyro_data, joint='Knee', leg='Left')
 beta = (beta - beta.mean(axis=1)[:, None]) * std_ratio + alpha.mean(axis=1)[:, None]
 print(beta.shape, alpha.shape)
 theta = weight * alpha + (1 - weight) * beta
-np.save('pred_angles.npy',theta)
+result_path = osp.join('Data/my_new_result/Results/',('pred_angles_'+pos[i]+'.npy'))
+np.save(result_path,theta)
 
 
 
