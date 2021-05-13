@@ -2,7 +2,7 @@
 This project uses Intertial Measurement Unit (IMU) data to predict Joint angles using Deep Learning Models (CNN and LSTM). 
  # Installation
    ## Use pretrained model to run the data
-   1. # Clone the repository
+   1. ### Clone the repository
         ```
         git clone https://github.com/amukherjea/IMU_Kinematics.git
         ```
