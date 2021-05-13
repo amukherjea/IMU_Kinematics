@@ -15,6 +15,10 @@ data_path = osp.join(base_dir, name_dir)
 result_path = osp.join('Data',result_fldr)
 count = 0
 i =0
+
+'''
+Extracting data for Vary Length trials
+'''
 for loc in range(0,len(locations),2):
     path = osp.join(data_path,(locations[loc]+'.csv'))
     data = genfromtxt(path, delimiter=',')
